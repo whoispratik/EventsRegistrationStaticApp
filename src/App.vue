@@ -24,6 +24,7 @@
           v-for="booking in bookings"
           :key="booking.id"
           :event-title="booking.eventTitle"
+          :status="booking.status"
         ></BookingItem>
       </template>
       <template v-else>
@@ -54,18 +55,35 @@ const bookings = ref([])
 const eventsLoading = ref(false)
 const bookingsLoading = ref(false)
 async function regHandler(event) {
+  if (bookings.value.some((booking) => booking.eventId === event.id && booking.userId === 1)) {
+    alert('You are already registered for this event.')
+    return
+  }
   const newBooking = {
     id: Date.now().toString(),
     userId: 1,
     eventId: event.id,
-    eventTitle: event.title
+    eventTitle: event.title,
+    status: 'pending'
   }
-  await fetch('http://localhost:3001/bookings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...newBooking, status: 'confirmed' })
-  })
-  await fetchBookings()
+  bookings.value.push(newBooking)
+  try {
+    const response = await fetch('http://localhost:3001/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newBooking, status: 'confirmed' })
+    })
+
+    if (response.ok) {
+      const index = bookings.value.findIndex((b) => b.id === newBooking.id)
+      bookings.value[index] = await response.json()
+    } else {
+      throw new Error('failed to confirm booking')
+    }
+  } catch (e) {
+    console.log('failed to register for event', e)
+    bookings.value = bookings.value.filter((b) => b.id !== newBooking.id)
+  }
 }
 const fetchEvents = async () => {
   eventsLoading.value = true

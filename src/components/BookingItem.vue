@@ -2,7 +2,10 @@
   <SectionCard
     ><template #bookingitem>
       <div class="flex justify-between">
-        <div>{{ eventTitle }}</div>
+        <div class="flex space-x-2">
+          <div>{{ eventTitle }}</div>
+          <div>{{ status }}</div>
+        </div>
         <RoundButton variant="danger" @click.stop="$emit('cancel')"> Cancel</RoundButton>
       </div>
     </template>
@@ -24,5 +27,5 @@ onBeforeMount(() => {
 import SectionCard from './SectionCard.vue'
 import RoundButton from './RoundButton.vue'
 defineEmits(['cancel'])
-defineProps({ eventTitle: String })
+defineProps({ eventTitle: String, status: String })
 </script>
