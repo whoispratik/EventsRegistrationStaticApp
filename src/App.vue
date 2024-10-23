@@ -25,6 +25,7 @@
           :key="booking.id"
           :event-title="booking.eventTitle"
           :status="booking.status"
+          @cancel="cancelHandler(booking.id)"
         ></BookingItem>
       </template>
       <template v-else>
@@ -54,6 +55,7 @@ const events = ref([])
 const bookings = ref([])
 const eventsLoading = ref(false)
 const bookingsLoading = ref(false)
+const findBookingById = (id) => bookings.value.findIndex((b) => b.id === id)
 async function regHandler(event) {
   if (bookings.value.some((booking) => booking.eventId === event.id && booking.userId === 1)) {
     alert('You are already registered for this event.')
@@ -75,8 +77,8 @@ async function regHandler(event) {
     })
 
     if (response.ok) {
-      const index = bookings.value.findIndex((b) => b.id === newBooking.id)
-      bookings.value[index] = await response.json()
+      const index = findBookingById(newBooking.id) //bookings.value.findIndex((b) => b.id === newBooking.id)
+      bookings.value[index] = await response.json() // updating the status to confirm
     } else {
       throw new Error('failed to confirm booking')
     }
@@ -95,6 +97,21 @@ const fetchEvents = async () => {
   }
   // console.log(events.value)
 }
+async function cancelHandler(id) {
+  const index = findBookingById(id)
+  const originalBooking = bookings.value[index]
+  bookings.value.splice(index, 1)
+
+  try {
+    const response = await fetch(`http://localhost:3001/bookings/${id}`, {
+      method: 'DELETE'
+    })
+    if (!response.ok) throw new Error('Booking could not be cancelled')
+  } catch (e) {
+    console.error(`Failed to cancel booking:`, e)
+    bookings.value.splice(index, 0, originalBooking)
+  }
+}
 async function fetchBookings() {
   bookingsLoading.value = true
   try {
@@ -104,6 +121,7 @@ async function fetchBookings() {
     bookingsLoading.value = false
   }
 }
+
 onMounted(() => {
   fetchEvents()
   fetchBookings()
