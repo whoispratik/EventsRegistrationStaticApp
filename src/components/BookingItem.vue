@@ -4,7 +4,7 @@
       <div class="flex justify-between">
         <div class="flex space-x-2">
           <div>{{ eventTitle }}</div>
-          <div>{{ status }}</div>
+          <div><component :is="icon" :class="{ 'animate-spin': pending }"></component></div>
         </div>
         <RoundButton variant="danger" @click.stop="$emit('cancel')"> Cancel</RoundButton>
       </div>
@@ -24,8 +24,12 @@ onBeforeMount(() => {
   console.log('BeforeMount hook of BookingItem(Child)')
 })
   */
+import { computed } from 'vue'
 import SectionCard from './SectionCard.vue'
 import RoundButton from './RoundButton.vue'
+import { LoaderCircle, Check } from 'lucide-vue-next'
 defineEmits(['cancel'])
-defineProps({ eventTitle: String, status: String })
+const props = defineProps({ eventTitle: String, status: String })
+const pending = computed(() => props.status === 'pending')
+const icon = computed(() => (pending.value ? LoaderCircle : Check))
 </script>

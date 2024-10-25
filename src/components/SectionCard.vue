@@ -14,6 +14,9 @@
     <template v-if="$slots.bookingitem">
       <div class="p-4"><slot name="bookingitem"></slot></div>
     </template>
+    <template v-if="$slots.retry">
+      <div class="p-4"><slot name="retry"></slot></div>
+    </template>
   </RoundedCard>
 </template>
 
