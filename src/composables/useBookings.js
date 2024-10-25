@@ -1,17 +1,20 @@
 import { ref } from 'vue'
+const error = ref(false)
 const bookings = ref([])
 const bookingsLoading = ref(false)
 const fetchBookings = async () => {
+  error.value = false
   bookingsLoading.value = true
   try {
     const response = await fetch('http://localhost:3001/bookings')
     bookings.value = await response.json()
+  } catch (e) {
+    error.value = e
   } finally {
     bookingsLoading.value = false
   }
 }
 const findBookingById = (id) => bookings.value.findIndex((b) => b.id === id)
-
 async function regHandler(event) {
   if (bookings.value.some((booking) => booking.eventId === event.id && booking.userId === 1)) {
     alert('You are already registered for this event.')
@@ -62,6 +65,7 @@ export default function useBookings() {
   return {
     bookings,
     bookingsLoading,
+    error,
     fetchBookings,
     regHandler,
     cancelHandler

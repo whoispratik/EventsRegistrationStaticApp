@@ -1,13 +1,6 @@
 <template>
   <template v-if="error">
-    <SectionCard>
-      <template #retry>
-        <div class="space-y-4 items-center flex flex-col">
-          <div class="text-red-500">Could not load events at the moment. Please try again.</div>
-          <RoundButton @click="fetchEvents">Retry now</RoundButton>
-        </div>
-      </template>
-    </SectionCard>
+    <ErrorCard :retry="fetchEvents">Couldnt load Events at this time please try again</ErrorCard>
   </template>
   <template v-else>
     <template v-if="!eventsLoading">
@@ -35,8 +28,7 @@
 import { ref, onMounted } from 'vue'
 import EventCard from './EventCard.vue'
 import LoadingEventCard from './LoadingEventCard.vue'
-import SectionCard from '@/components/SectionCard.vue'
-import RoundButton from './RoundButton.vue'
+import ErrorCard from './ErrorCard.vue'
 import useBookings from '@/composables/useBookings'
 const { regHandler } = useBookings()
 const events = ref([])
